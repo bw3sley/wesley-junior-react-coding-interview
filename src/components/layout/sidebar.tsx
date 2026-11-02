@@ -6,6 +6,7 @@ export type Screen = "dashboard" | "tickets" | "agents";
 interface SidebarProps {
   activeScreen: Screen;
   onNavigate: (screen: Screen) => void;
+  isOpen: boolean;
 }
 
 const navItems = [
@@ -14,9 +15,9 @@ const navItems = [
   { icon: UsersRound, label: "Agents", screen: "agents" as Screen },
 ];
 
-export function Sidebar({ activeScreen, onNavigate }: SidebarProps) {
+export function Sidebar({ activeScreen, onNavigate, isOpen }: SidebarProps) {
   return (
-    <aside className="sidebar">
+    <aside id="mobile-sidebar" className={`sidebar ${isOpen ? "sidebar--open" : ""}`}>
       <nav className="sidebar__nav">
         <ul className="sidebar__list">
           {navItems.map((item) => {

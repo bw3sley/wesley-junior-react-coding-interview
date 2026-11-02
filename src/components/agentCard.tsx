@@ -11,9 +11,10 @@ export const SPECIALTY_MAP: Record<string, { label: string; variant: BadgeProps[
 
 interface AgentCardProps {
   agent: SupportAgent;
+  ticketCount?: number;
 }
 
-export function AgentCard({ agent }: AgentCardProps) {
+export function AgentCard({ agent, ticketCount }: AgentCardProps) {
   const { firstName, lastName, email, specialty } = agent;
   const specialtyInfo = SPECIALTY_MAP[specialty];
 
@@ -32,6 +33,9 @@ export function AgentCard({ agent }: AgentCardProps) {
       <div className="agent-card__footer">
         <span className="agent-card__label">Area:</span>
         <Badge variant={specialtyInfo.variant}>{specialtyInfo.label}</Badge>
+        {ticketCount !== undefined && (
+          <span className="agent-card__count">{ticketCount} tickets</span>
+        )}
       </div>
     </Card>
   );

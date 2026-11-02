@@ -28,20 +28,21 @@ The dashboard helps support managers inspect incoming tickets, identify urgent i
 
 The app includes:
 
-- Ticket list
-- Ticket assignment flow
-- Agent directory
+- Dashboard with ticket counts and status and priority charts
+- Searchable ticket list with sorting and pagination
+- Ticket assignment to agents whose specialty matches the ticket category
+- Searchable agent directory with sorting and pagination
 - Generated mock support data
-- Simulated API latency
+- Simulated 1.2-second API latency
 
 ## Data
 
 Mock ticket data is generated locally into `src/data/db.json` when the app starts or builds. The generated file is ignored by Git.
+Assignments update the in-memory mock API and reset when the page reloads.
 
 To regenerate the data manually:
 
 ```bash
-rm -f src/data/db.json
 npm run generate-data
 ```
 
@@ -62,5 +63,8 @@ Agents are defined in `src/data/agents.ts` and include a specialty matching one 
 - React
 - TypeScript
 - Vite
-- CSS modules by convention using plain CSS files
+- Recharts for dashboard charts
+- TanStack Table for sorting and pagination
+- Radix Select for mobile sort controls
+- Plain CSS
 - Generated mock data with Faker

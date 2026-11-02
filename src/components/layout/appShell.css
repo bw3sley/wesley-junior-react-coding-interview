@@ -15,7 +15,21 @@
   min-width: 0;
 }
 
+.app-shell__sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  .app-shell__sidebar-backdrop {
+    display: block;
+    position: fixed;
+    z-index: 20;
+    inset: var(--topbar-height) 0 0;
+    width: 100%;
+    border: 0;
+    background: rgba(17, 24, 39, 0.35);
+  }
+
   .app-shell__main {
     padding: var(--space-4);
   }

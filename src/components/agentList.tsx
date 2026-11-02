@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import type { SupportAgent } from "@/types/supportCase";
-import { fetchAgents } from "@/data/mockApi";
-import { AgentCard } from "./agentCard";
+import type { SupportAgent, SupportCase } from "@/types/supportCase";
+import { fetchAgents, fetchCases } from "@/data/mockApi";
 import { AgentsTable } from "./agentsTable";
+import { ListSkeleton } from "./listSkeleton";
 
 export function AgentList() {
   const [agents, setAgents] = useState<SupportAgent[]>([]);
+  const [tickets, setTickets] = useState<SupportCase[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [dataState, setDataState] = useState<"loading" | "error" | "ready">("loading");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -15,10 +17,11 @@ export function AgentList() {
     setDataState("loading");
     setErrorMessage("");
 
-    fetchAgents()
-      .then((data) => {
+    Promise.all([fetchAgents(), fetchCases()])
+      .then(([agentData, ticketData]) => {
         if (!cancelled) {
-          setAgents(data);
+          setAgents(agentData);
+          setTickets(ticketData);
           setDataState("ready");
         }
       })
@@ -37,10 +40,10 @@ export function AgentList() {
   }, []);
 
   if (dataState === "loading") {
-    return null;
+    return <ListSkeleton kind="agents" />;
   }
 
-  if (dataState === "error" || agents.length === 0) {
+  if (dataState === "error") {
     return (
       <div className="ticket-list-state">
         <p>Something went wrong.</p>
@@ -49,13 +52,43 @@ export function AgentList() {
     );
   }
 
+  if (agents.length === 0) {
+    return (
+      <div className="ticket-list-state">
+        <p>No agents found.</p>
+      </div>
+    );
+  }
+
+  const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
+  const filteredAgents = normalizedQuery
+    ? agents.filter((agent) =>
+        `${agent.firstName} ${agent.lastName} ${agent.email}`
+          .toLocaleLowerCase()
+          .includes(normalizedQuery),
+      )
+    : agents;
+
   return (
     <div className="agent-list">
-      <AgentsTable />
+      <label className="search-field" htmlFor="agent-list-search">
+        <span className="search-field__label">Search agents</span>
+
+        <input
+          id="agent-list-search"
+          className="search-field__input"
+          type="search"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Search by name or email"
+        />
+      </label>
       
-      {agents.map((agent) => (
-        <AgentCard key={agent.id} agent={agent} />
-      ))}
+      {filteredAgents.length > 0 ? (
+        <AgentsTable agents={filteredAgents} tickets={tickets} />
+      ) : (
+        <div className="ticket-list-state">No agents match your search.</div>
+      )}
     </div>
   );
 }

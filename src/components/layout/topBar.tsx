@@ -1,8 +1,25 @@
+import { Menu, X } from "lucide-react";
 import "./topBar.css";
 
-export function TopBar() {
+interface TopBarProps {
+  isSidebarOpen: boolean;
+  onToggleSidebar: () => void;
+}
+
+export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
   return (
     <header className="top-bar">
+      <button
+        className="top-bar__sidebar-toggle"
+        type="button"
+        aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+        aria-controls="mobile-sidebar"
+        aria-expanded={isSidebarOpen}
+        onClick={onToggleSidebar}
+      >
+        {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
       <div className="top-bar__logo">
         <svg
           width="24"

@@ -19,3 +19,43 @@
   font-weight: var(--font-semibold);
   font-size: var(--text-lg);
 }
+
+.top-bar__sidebar-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .top-bar {
+    position: relative;
+    z-index: 30;
+    gap: var(--space-3);
+    padding: 0 var(--space-4);
+  }
+
+  .top-bar__sidebar-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text);
+  }
+
+  .top-bar__sidebar-toggle:hover {
+    background: var(--color-surface-tertiary);
+  }
+
+  .top-bar__logo {
+    min-width: 0;
+    gap: var(--space-2);
+  }
+
+  .top-bar__title {
+    font-size: var(--text-base);
+    white-space: nowrap;
+  }
+}

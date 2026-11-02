@@ -52,6 +52,10 @@ export async function assignAgent(
     throw new Error(`Cannot assign agent to a ${targetCase.status} case`);
   }
 
+  if (targetCase.agentId !== null) {
+    throw new Error(`Case ${caseId} already has an agent`);
+  }
+
   if (agent.specialty !== targetCase.category) {
     throw new Error(
       `Agent specialty ${agent.specialty} does not match case category ${targetCase.category}`,
@@ -60,6 +64,7 @@ export async function assignAgent(
 
   targetCase.agentId = agentId;
   targetCase.status = "in-progress";
+  targetCase.updatedAt = new Date();
 
   return targetCase;
 }
