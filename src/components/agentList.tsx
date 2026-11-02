@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { SupportAgent } from "@/types/supportCase";
 import { fetchAgents } from "@/data/mockApi";
 import { AgentCard } from "./agentCard";
+import { AgentsTable } from "./agentsTable";
 
 export function AgentList() {
   const [agents, setAgents] = useState<SupportAgent[]>([]);
@@ -50,6 +51,8 @@ export function AgentList() {
 
   return (
     <div className="agent-list">
+      <AgentsTable />
+      
       {agents.map((agent) => (
         <AgentCard key={agent.id} agent={agent} />
       ))}

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { BadgeProps } from "@/components/ui/badge";
 
-const SPECIALTY_MAP: Record<string, { label: string; variant: BadgeProps["variant"] }> = {
+export const SPECIALTY_MAP: Record<string, { label: string; variant: BadgeProps["variant"] }> = {
   billing: { label: "Billing", variant: "default" },
   technical: { label: "Technical", variant: "warning" },
   account: { label: "Account", variant: "success" },
