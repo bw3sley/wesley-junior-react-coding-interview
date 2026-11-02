@@ -1,0 +1,35 @@
+{
+  "name": "support-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/data/generateData.ts && vite",
+    "generate-data": "tsx src/data/generateData.ts",
+    "build": "tsx src/data/generateData.ts && tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.4.0",
+    "@types/node": "^25.9.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.18.0",
+    "globals": "^17.6.0",
+    "prettier": "^3.4.2",
+    "tsx": "^4.22.4",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.60.1",
+    "vite": "^6.0.0"
+  }
+}
