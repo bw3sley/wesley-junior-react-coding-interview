@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { agents } from "@/data/agents";
 import { fetchCases } from "@/data/mockApi";
 import type { SupportCase } from "@/types/supportCase";
-import { DashboardChart } from "./dashboardChart";
 import { Card } from "./ui/card";
 import { Spinner } from "./ui/spinner";
+
+// recharts is heavy; load it in its own chunk instead of the main bundle.
+const DashboardChart = lazy(() =>
+  import("./dashboardChart").then((module) => ({
+    default: module.DashboardChart,
+  })),
+);
 
 export function DashboardScreen() {
   const [cases, setCases] = useState<SupportCase[]>([]);
@@ -31,6 +37,35 @@ export function DashboardScreen() {
     };
   }, []);
 
+  const stats = useMemo(() => {
+    const now = new Date();
+    const result = {
+      total: cases.length,
+      open: 0,
+      inProgress: 0,
+      closed: 0,
+      overdue: 0,
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0,
+    };
+
+    for (const supportCase of cases) {
+      if (supportCase.status === "open") result.open++;
+      else if (supportCase.status === "in-progress") result.inProgress++;
+      else if (supportCase.status === "closed") result.closed++;
+
+      if (supportCase.status !== "closed" && supportCase.deadline < now) {
+        result.overdue++;
+      }
+
+      result[supportCase.priority]++;
+    }
+
+    return result;
+  }, [cases]);
+
   if (dataState === "loading") {
     return (
       <div className="dashboard__state" role="status">
@@ -48,21 +83,7 @@ export function DashboardScreen() {
     );
   }
 
-  const total = cases.length;
-  const open = cases.filter(
-    (supportCase) => supportCase.status === "open",
-  ).length;
-  const inProgress = cases.filter(
-    (supportCase) => supportCase.status === "in-progress",
-  ).length;
-  const closed = cases.filter(
-    (supportCase) => supportCase.status === "closed",
-  ).length;
-  const now = new Date();
-  const overdue = cases.filter(
-    (supportCase) =>
-      supportCase.status !== "closed" && supportCase.deadline < now,
-  ).length;
+  const { total, open, inProgress, closed, overdue } = stats;
 
   const summary = [
     { label: "Total tickets", value: total },
@@ -71,6 +92,7 @@ export function DashboardScreen() {
     { label: "Overdue", value: overdue },
     { label: "Total agents", value: agents.length },
   ];
+
   const statusRows = [
     { label: "Open", count: open, color: "var(--color-blue-600)" },
     {
@@ -80,25 +102,26 @@ export function DashboardScreen() {
     },
     { label: "Closed", count: closed, color: "var(--color-green-600)" },
   ];
+
   const priorityRows = [
     {
       label: "Critical",
-      count: cases.filter((item) => item.priority === "critical").length,
+      count: stats.critical,
       color: "var(--color-red-500)",
     },
     {
       label: "High",
-      count: cases.filter((item) => item.priority === "high").length,
+      count: stats.high,
       color: "var(--color-orange-500)",
     },
     {
       label: "Medium",
-      count: cases.filter((item) => item.priority === "medium").length,
+      count: stats.medium,
       color: "var(--color-blue-500)",
     },
     {
       label: "Low",
-      count: cases.filter((item) => item.priority === "low").length,
+      count: stats.low,
       color: "var(--color-gray-400)",
     },
   ];
@@ -119,20 +142,29 @@ export function DashboardScreen() {
         ))}
       </section>
 
-      <div className="dashboard__charts">
-        <DashboardChart
-          id="dashboard-status-title"
-          title="Tickets by status"
-          rows={statusRows}
-          total={total}
-        />
-        <DashboardChart
-          id="dashboard-priority-title"
-          title="Tickets by priority"
-          rows={priorityRows}
-          total={total}
-        />
-      </div>
+      <Suspense
+        fallback={
+          <div className="dashboard__state" role="status">
+            <Spinner />
+          </div>
+        }
+      >
+        <div className="dashboard__charts">
+          <DashboardChart
+            id="dashboard-status-title"
+            title="Tickets by status"
+            rows={statusRows}
+            total={total}
+          />
+
+          <DashboardChart
+            id="dashboard-priority-title"
+            title="Tickets by priority"
+            rows={priorityRows}
+            total={total}
+          />
+        </div>
+      </Suspense>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useDeferredValue } from "react";
 import type { SupportAgent, SupportCase } from "@/types/supportCase";
 import { fetchAgents, fetchCases } from "@/data/mockApi";
 import { AgentsTable } from "./agentsTable";
@@ -10,6 +10,20 @@ export function AgentList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dataState, setDataState] = useState<"loading" | "error" | "ready">("loading");
   const [errorMessage, setErrorMessage] = useState("");
+  const deferredQuery = useDeferredValue(searchQuery);
+  const normalizedQuery = deferredQuery.trim().toLocaleLowerCase();
+
+  const filteredAgents = useMemo(
+    () =>
+      normalizedQuery
+        ? agents.filter((agent) =>
+            `${agent.firstName} ${agent.lastName} ${agent.email}`
+              .toLocaleLowerCase()
+              .includes(normalizedQuery),
+          )
+        : agents,
+    [agents, normalizedQuery],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -17,11 +31,18 @@ export function AgentList() {
     setDataState("loading");
     setErrorMessage("");
 
-    Promise.all([fetchAgents(), fetchCases()])
-      .then(([agentData, ticketData]) => {
+    // Tickets only feed the ticket-count column, so a failure there
+    // must not hide the agents list.
+    fetchCases()
+      .then((ticketData) => {
+        if (!cancelled) setTickets(ticketData);
+      })
+      .catch(() => {});
+
+    fetchAgents()
+      .then((agentData) => {
         if (!cancelled) {
           setAgents(agentData);
-          setTickets(ticketData);
           setDataState("ready");
         }
       })
@@ -59,15 +80,6 @@ export function AgentList() {
       </div>
     );
   }
-
-  const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
-  const filteredAgents = normalizedQuery
-    ? agents.filter((agent) =>
-        `${agent.firstName} ${agent.lastName} ${agent.email}`
-          .toLocaleLowerCase()
-          .includes(normalizedQuery),
-      )
-    : agents;
 
   return (
     <div className="agent-list">

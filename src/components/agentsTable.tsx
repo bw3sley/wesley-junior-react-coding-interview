@@ -54,11 +54,19 @@ export function AgentsTable({ agents, tickets }: AgentsTableProps) {
         header: "Agent",
         sortFn: sortFn_text,
         cell: ({ row }) => (
-          <div className="data-table__primary-cell">
-            <span className="data-table__primary-text">
-              {row.original.firstName} {row.original.lastName}
+          <div className="data-table__agent-cell">
+            <span className="agent-card__avatar" aria-hidden="true">
+              {row.original.firstName[0]}
+              {row.original.lastName[0]}
             </span>
-            <span className="data-table__secondary-text">{row.original.email}</span>
+            <div className="data-table__primary-cell">
+              <span className="data-table__primary-text">
+                {row.original.firstName} {row.original.lastName}
+              </span>
+              <span className="data-table__secondary-text">
+                {row.original.email}
+              </span>
+            </div>
           </div>
         ),
       },

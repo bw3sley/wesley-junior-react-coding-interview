@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TopBar } from "./components/layout/topBar";
 import { Sidebar, type Screen } from "./components/layout/sidebar";
 import { TicketList } from "./components/ticketList";
@@ -24,9 +24,11 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isSidebarOpen]);
 
-  function handleSelectCase(supportCase: SupportCase) {
+  const handleSelectCase = useCallback((supportCase: SupportCase) => {
     setSelectedCase(supportCase);
-  }
+  }, []);
+
+  const handleBack = useCallback(() => setSelectedCase(null), []);
 
   function handleNavigate(screen: Screen) {
     setSelectedCase(null);
@@ -41,7 +43,7 @@ export default function App() {
 
     if (activeScreen === "tickets") {
       if (selectedCase) {
-        return <AssignScreen supportCase={selectedCase} onBack={() => setSelectedCase(null)} />;
+        return <AssignScreen supportCase={selectedCase} onBack={handleBack} />;
       }
       return <TicketList onSelectCase={handleSelectCase} />;
     }

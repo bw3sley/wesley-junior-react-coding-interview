@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useDeferredValue } from "react";
 import type { SupportCase } from "@/types/supportCase";
 import { fetchCases } from "@/data/mockApi";
 import { TicketsTable } from "./ticketsTable";
@@ -15,6 +15,23 @@ export function TicketList({ onSelectCase }: TicketListProps) {
     "loading",
   );
   const [errorMessage, setErrorMessage] = useState("");
+  const deferredQuery = useDeferredValue(searchQuery);
+  const normalizedQuery = deferredQuery.trim().toLocaleLowerCase();
+
+  const filteredTickets = useMemo(
+    () =>
+      normalizedQuery
+        ? tickets.filter((ticket) =>
+            [
+              ticket.id,
+              ticket.subject,
+              ticket.customer,
+              ticket.customerEmail,
+            ].some((value) => value.toLocaleLowerCase().includes(normalizedQuery)),
+          )
+        : tickets,
+    [tickets, normalizedQuery],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -63,15 +80,6 @@ export function TicketList({ onSelectCase }: TicketListProps) {
       </div>
     );
   }
-
-  const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
-  const filteredTickets = normalizedQuery
-    ? tickets.filter((ticket) =>
-        [ticket.id, ticket.subject, ticket.customer, ticket.customerEmail].some(
-          (value) => value.toLocaleLowerCase().includes(normalizedQuery),
-        ),
-      )
-    : tickets;
 
   return (
     <div className="ticket-list">

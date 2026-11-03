@@ -576,6 +576,12 @@ button {
   font-size: var(--text-base);
 }
 
+.data-table__agent-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .data-table__primary-cell {
   display: flex;
   flex-direction: column;
